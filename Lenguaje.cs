@@ -435,7 +435,7 @@ namespace Semantica
         }
 
         //If -> if(Condicion) bloque de instrucciones (else bloque de instrucciones)?
-        private void If()
+        private void If(bool evaluacion)
         {
             match("if");
             match("(");
@@ -501,7 +501,7 @@ namespace Semantica
         }
 
         //Scanf -> scanf(cadena, &identificador);
-        private void Scanf()    
+        private void Scanf(bool evaluacion)    
         {
             match("scanf");
             match("(");
@@ -528,7 +528,7 @@ namespace Semantica
             match("main");
             match("(");
             match(")");
-            BloqueInstrucciones(evaluacion);
+            BloqueInstrucciones(true);
         }
 
         //Expresion -> Termino MasTermino
@@ -643,7 +643,8 @@ namespace Semantica
                     //Saco un elemento del stack
                     //Convierte ese valor  al equivalente en casteo
                     //Requerimiento 3
-                    
+                    //si el casteo es char y el pop regresa un 256, el valor equivalente es un 0
+                    //meto ese valor al stack
 
                 }
             }

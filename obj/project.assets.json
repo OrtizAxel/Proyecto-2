@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Axrro\\OneDrive\\Documentos\\Escuela\\Tareas\\Lenguajes y Automatas II\\Semantica\\Semantica.csproj",
+      "projectUniqueName": "C:\\Users\\Axrro\\OneDrive\\Documentos\\Escuela\\Tareas\\Lenguajes y Automatas II\\Repositorio\\Proyecto-2\\Semantica.csproj",
       "projectName": "Semantica",
-      "projectPath": "C:\\Users\\Axrro\\OneDrive\\Documentos\\Escuela\\Tareas\\Lenguajes y Automatas II\\Semantica\\Semantica.csproj",
+      "projectPath": "C:\\Users\\Axrro\\OneDrive\\Documentos\\Escuela\\Tareas\\Lenguajes y Automatas II\\Repositorio\\Proyecto-2\\Semantica.csproj",
       "packagesPath": "C:\\Users\\Axrro\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Axrro\\OneDrive\\Documentos\\Escuela\\Tareas\\Lenguajes y Automatas II\\Semantica\\obj\\",
+      "outputPath": "C:\\Users\\Axrro\\OneDrive\\Documentos\\Escuela\\Tareas\\Lenguajes y Automatas II\\Repositorio\\Proyecto-2\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Axrro\\AppData\\Roaming\\NuGet\\NuGet.Config"
