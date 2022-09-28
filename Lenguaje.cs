@@ -6,6 +6,9 @@ using System.Collections.Generic;
 //Requerimiento 3.- Programar un metodo de conversion de un valor a un tipo de dato
 //                  private float convert(float valor, string tipoDato)
 //                  deberan usar el residuo de la division por %255, por %65535
+//Requerimiento 4.- Evaluar nuevamente la condicion del if, while, o do while con respecto
+//                  al parametro que recibe
+//Requerimiento 5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
 
 namespace Semantica
 {
@@ -154,6 +157,17 @@ namespace Semantica
                 Lista_identificadores(tipo);
             }
         }
+        
+        //Main      -> void main() Bloque de instrucciones
+        private void Main()
+        {
+            match("void");
+            match("main");
+            match("(");
+            match(")");
+            BloqueInstrucciones(true);
+        }
+
         //Bloque de instrucciones -> {listaIntrucciones?}
         private void BloqueInstrucciones(bool evaluacion)
         {
@@ -288,7 +302,8 @@ namespace Semantica
         {
             match("while");
             match("(");
-            Condicion();
+            bool validarWhile = Condicion();
+            //Requerimiento 4
             match(")");
             if(getContenido() == "{") 
             {
@@ -314,17 +329,20 @@ namespace Semantica
             } 
             match("while");
             match("(");
-            Condicion();
+            //Requerimiento 4
+            bool validarDo = Condicion();
             match(")");
             match(";");
         }
+
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
         {
             match("for");
             match("(");
             Asignacion(evaluacion);
-            Condicion();
+            //Requerimiento 4
+            bool valodarFor = Condicion();
             match(";");
             Incremento(evaluacion);
             match(")");
@@ -439,6 +457,7 @@ namespace Semantica
         {
             match("if");
             match("(");
+            //Requerimiento 4
             bool validarIf = Condicion();
             match(")");
             if(getContenido() == "{")
@@ -452,6 +471,7 @@ namespace Semantica
             if(getContenido() == "else")
             {
                 match("else");
+                //Requerimiento 4 Se debe comportar alravez
                 if(getContenido() == "{")
                 {
                     BloqueInstrucciones(validarIf);
@@ -511,24 +531,17 @@ namespace Semantica
             if(!existeVariable(getContenido()))
             {
                 throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
-            }          
-            string val = ""+Console.ReadLine(); 
-            float  Val;
-            Val = float.Parse(val);
-            modVariable(getContenido(), Val);
+            } 
+            if(evaluacion)
+            {
+                string val = ""+Console.ReadLine(); 
+                //Requerimiento 5
+                float valorFloat = float.Parse(val);
+                modVariable(getContenido(), valorFloat);
+            }         
             match(Tipos.Identificador);
             match(")");
             match(";");
-        }
-
-        //Main      -> void main() Bloque de instrucciones
-        private void Main()
-        {
-            match("void");
-            match("main");
-            match("(");
-            match(")");
-            BloqueInstrucciones(true);
         }
 
         //Expresion -> Termino MasTermino
@@ -645,7 +658,7 @@ namespace Semantica
                     //Requerimiento 3
                     //si el casteo es char y el pop regresa un 256, el valor equivalente es un 0
                     //meto ese valor al stack
-
+                    //si
                 }
             }
         }
