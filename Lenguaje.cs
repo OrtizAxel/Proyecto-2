@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
 //Requerimiento 1.- Actualizar el dominante para variables en la expresion
-//                  Ejemplo: float x; char y; y=x
-//Requerimiento 2.- Actualizar el dominante para el casteo y el valor de la subexpresion
-//Requerimiento 3.- Programar un metodo de conversion de un valor a un tipo de dato
+//                  Ejemplo: float x; char y; y=x (Hecho)
+//Requerimiento 2.- Actualizar el dominante para el casteo y el valor de la subexpresion (Hecho)
+//Requerimiento 3.- Programar un metodo de conversion de un valor a un tipo de dato (Hecho)
 //                  private float convert(float valor, string tipoDato)
 //                  deberan usar el residuo de la division por %255, por %65535
 //Requerimiento 4.- Evaluar nuevamente la condicion del if, while, o do while con respecto
 //                  al parametro que recibe
 //Requerimiento 5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
+//Requerimiento 6.- Ejecutar el for() 
+
 
 namespace Semantica
 {
@@ -62,6 +64,23 @@ namespace Semantica
                 {
                     v.setValor(nuevoValor);
                 }
+            }
+        }
+        
+        private float convert(float valor, Variable.TipoDato tipo)
+        {
+            if(dominante == Variable.TipoDato.Char && valor > 255)
+            {
+                valor = valor%256;
+                return valor;
+            } else if(dominante == Variable.TipoDato.Int && valor > 65535)
+            {
+                valor = valor%65536;
+                return valor;
+            }
+            else
+            {
+                return valor;
             }
         }
 
@@ -342,18 +361,27 @@ namespace Semantica
             match("(");
             Asignacion(evaluacion);
             //Requerimiento 4
+            //Requerimiento 6:
+            //                  a)Necesito guardar la posicion del archivo de texto 
             bool valodarFor = Condicion();
-            match(";");
-            Incremento(evaluacion);
-            match(")");
-            if(getContenido() == "{")
-            {
-                BloqueInstrucciones(evaluacion);  
-            }
-            else
-            {
-                Instruccion(evaluacion);
-            }
+            //                  b)Agregar un ciclo while
+            //while()
+            //{
+                match(";");
+                Incremento(evaluacion);
+                match(")");
+                if(getContenido() == "{")
+                {
+                    BloqueInstrucciones(evaluacion);  
+                }
+                else
+                {
+                    Instruccion(evaluacion);
+                }
+                //              c)Regresar a la posicion de lectura del archivo
+                //              d)Sacar otro token
+            //}
+            
         }
 
         //Incremento -> Identificador ++ | --
@@ -619,8 +647,11 @@ namespace Semantica
                 {
                     throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
                 }
-                //Requerimiento 1
                 log.Write(getContenido() + " ");
+                if(dominante < getTipo(getContenido()))
+                {
+                    dominante = getTipo(getContenido());
+                }
                 stack.Push(getValor(getContenido()));
                 match(Tipos.Identificador);
             }
@@ -652,13 +683,14 @@ namespace Semantica
                 match(")");
                 if(huboCasteo)
                 {
-                    //Requerimiento 2
-                    //Saco un elemento del stack
-                    //Convierte ese valor  al equivalente en casteo
-                    //Requerimiento 3
-                    //si el casteo es char y el pop regresa un 256, el valor equivalente es un 0
-                    //meto ese valor al stack
-                    //si
+                    dominante = casteo;
+                    float valor = stack.Pop();
+                    if(valor%1 !=0 || dominante != Variable.TipoDato.Float)
+                    {
+                        valor = MathF.Truncate(valor);
+                         valor = convert(valor, dominante);
+                    }
+                    stack.Push(valor);
                 }
             }
         }

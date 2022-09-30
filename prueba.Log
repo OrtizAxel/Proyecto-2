@@ -1,11 +1,7 @@
 Archivo: prueba.cpp
-27/09/2022 09:52:36 a. m.
-3 5 + 10 
+30/09/2022 10:53:36 a. m.
+
+x = 257 = 1
+
 Variables: 
-area Float 0
-radio Float 0
-pi Float 0
-resultado Float 0
-a Int 0
-d Int 0
-x Char 0
+x Char 1
