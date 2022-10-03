@@ -1,3 +1,4 @@
+//Axel Ortiz Ricalde
 using System;
 using System.Collections.Generic;
 //Requerimiento 1.- Actualizar el dominante para variables en la expresion
@@ -7,11 +8,9 @@ using System.Collections.Generic;
 //                  private float convert(float valor, string tipoDato)
 //                  deberan usar el residuo de la division por %255, por %65535
 //Requerimiento 4.- Evaluar nuevamente la condicion del if, while, o do while con respecto
-//                  al parametro que recibe
+//                  al parametro que recibe (Hecho)
 //Requerimiento 5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
 //Requerimiento 6.- Ejecutar el for() 
-
-
 namespace Semantica
 {
     public class Lenguaje : Sintaxis
@@ -323,33 +322,42 @@ namespace Semantica
             match("(");
             bool validarWhile = Condicion();
             //Requerimiento 4
+            if(!evaluacion)
+            {
+                validarWhile = false;
+            }
             match(")");
             if(getContenido() == "{") 
             {
-                BloqueInstrucciones(evaluacion);
+                BloqueInstrucciones(validarWhile);
             }
             else
             {
-                Instruccion(evaluacion);
+                Instruccion(validarWhile);
             }
         }
 
         //Do -> do bloque de instrucciones | intruccion while(Condicion)
         private void Do(bool evaluacion)
         {
+            bool validarDo = evaluacion;
             match("do");
             if(getContenido() == "{")
             {
-                BloqueInstrucciones(evaluacion);
+                BloqueInstrucciones(validarDo);
             }
             else
             {
-                Instruccion(evaluacion);
+                Instruccion(validarDo);
             } 
             match("while");
             match("(");
             //Requerimiento 4
-            bool validarDo = Condicion();
+            validarDo = Condicion();
+            if(!evaluacion)
+            {
+                validarDo = false;
+            }
             match(")");
             match(";");
         }
@@ -487,14 +495,18 @@ namespace Semantica
             match("(");
             //Requerimiento 4
             bool validarIf = Condicion();
+            if(!evaluacion)
+            {
+                validarIf = false;
+            }
             match(")");
             if(getContenido() == "{")
             {
-                BloqueInstrucciones(validarIf);  
+                BloqueInstrucciones(validarIf);          
             }
             else
             {
-                Instruccion(validarIf);
+                Instruccion(validarIf);  
             }
             if(getContenido() == "else")
             {
@@ -502,11 +514,25 @@ namespace Semantica
                 //Requerimiento 4 Se debe comportar alravez
                 if(getContenido() == "{")
                 {
-                    BloqueInstrucciones(validarIf);
+                    if(evaluacion)
+                    {
+                        BloqueInstrucciones(!validarIf);
+                    }
+                    else
+                    {
+                        BloqueInstrucciones(evaluacion);
+                    }
                 }
                 else
                 {
-                    Instruccion(validarIf);
+                    if(evaluacion)
+                    {
+                        Instruccion(!validarIf);
+                    }
+                    else
+                    {
+                        BloqueInstrucciones(evaluacion);
+                    }
                 }
             }
         }
@@ -685,11 +711,11 @@ namespace Semantica
                 {
                     dominante = casteo;
                     float valor = stack.Pop();
-                    if(valor%1 !=0 || dominante != Variable.TipoDato.Float)
+                    if(valor%1 !=0 && dominante != Variable.TipoDato.Float)
                     {
                         valor = MathF.Truncate(valor);
-                         valor = convert(valor, dominante);
                     }
+                    valor = convert(valor, dominante);
                     stack.Push(valor);
                 }
             }
