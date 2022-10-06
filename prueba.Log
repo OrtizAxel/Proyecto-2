@@ -1,12 +1,17 @@
 Archivo: prueba.cpp
-02/10/2022 09:24:08 p. m.
+05/10/2022 09:52:29 a. m.
 
-x = 1 = 1
-
-j = 3 = 3
-3 5 + 10 
-j = j 1 + = 4
-j 6 
+var = 0 = 0
+var 3 
+f = 0 = 0
+f 2 f 2 f 2 var 3 
+f = 0 = 0
+f 2 f 2 f 2 var 3 
+f = 0 = 0
+f 2 f 2 f 2 var 3 
+f = 0 = 0
+f 2 
 Variables: 
-x Int 1
-j Int 4
+x Int 0
+var Int 3
+f Int 2

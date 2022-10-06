@@ -362,34 +362,54 @@ namespace Semantica
             match(";");
         }
 
+        public void setPosicion(long posicion)
+        {
+            archivo.DiscardBufferedData();
+            archivo.BaseStream.Seek(posicion, SeekOrigin.Begin);
+        }
+
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
         {
             match("for");
             match("(");
             Asignacion(evaluacion);
-            //Requerimiento 4
+            //Requerimiento 4:
             //Requerimiento 6:
-            //                  a)Necesito guardar la posicion del archivo de texto 
-            bool valodarFor = Condicion();
+            //                  a)Necesito guardar la posicion del archivo de texto
+            string variable = getContenido();
+            bool validarFor;
+            int pos = posicion;
+            int lin = linea;
             //                  b)Agregar un ciclo while
-            //while()
-            //{
+            do
+            {
+                validarFor = Condicion();
+                if(!evaluacion)
+                {
+                    validarFor = false;
+                }
                 match(";");
-                Incremento(evaluacion);
+                Incremento(validarFor);
                 match(")");
                 if(getContenido() == "{")
                 {
-                    BloqueInstrucciones(evaluacion);  
+                    BloqueInstrucciones(validarFor);  
                 }
                 else
                 {
-                    Instruccion(evaluacion);
+                    Instruccion(validarFor);
+                }
+                if(validarFor)
+                {
+                    posicion = pos - variable.Length;
+                    linea = lin;
+                    setPosicion(posicion);
+                    NextToken();
                 }
                 //              c)Regresar a la posicion de lectura del archivo
                 //              d)Sacar otro token
-            //}
-            
+            }while(validarFor);
         }
 
         //Incremento -> Identificador ++ | --
@@ -404,7 +424,7 @@ namespace Semantica
                 match("++");
                 if(evaluacion)
                 {
-                modVariable(variable, getValor(variable)+1);
+                    modVariable(variable, getValor(variable)+1);
                 }
             }
             else
@@ -412,7 +432,7 @@ namespace Semantica
                 match("--");
                 if(evaluacion)
                 {
-                modVariable(variable, getValor(variable)-1);
+                    modVariable(variable, getValor(variable)-1);
                 }
             }
         }
@@ -531,7 +551,7 @@ namespace Semantica
                     }
                     else
                     {
-                        BloqueInstrucciones(evaluacion);
+                        Instruccion(evaluacion);
                     }
                 }
             }
@@ -590,6 +610,11 @@ namespace Semantica
             {
                 string val = ""+Console.ReadLine(); 
                 //Requerimiento 5
+                double validaVal;
+                if(!double.TryParse(val, out validaVal))
+                {
+                    throw new Error("Error de sintaxis, se espera un numero en linea: "+linea, log);
+                }
                 float valorFloat = float.Parse(val);
                 modVariable(getContenido(), valorFloat);
             }         

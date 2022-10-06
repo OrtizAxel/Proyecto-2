@@ -6,11 +6,11 @@ namespace Semantica
 {
     public class Lexico : Token
     {
-        StreamReader archivo;
+        protected StreamReader archivo;
         protected StreamWriter log;
         const int F = -1;
         const int E = -2;
-        protected int linea;
+        protected int linea, posicion = 0;
         int[,] TRAND = new int[,]
         {
             //WS,EF,EL,L, D, .,	E, +, -, =,	:, ;, &, |,	!, >, <, *,	%, /, ", ?,La, ', #
@@ -275,7 +275,6 @@ namespace Semantica
             string buffer = "";           
             char c;      
             int estado = 0;
-
             while(estado >= 0)
             {
                 c = (char)archivo.Peek(); //Funcion de transicion
@@ -284,6 +283,7 @@ namespace Semantica
                 if (estado >= 0)
                 {
                     archivo.Read();
+                    posicion++;
                     if(c == '\n')
                     {
                         linea++;
