@@ -1,16 +1,16 @@
 //Axel Ortiz Ricalde
 using System;
 using System.Collections.Generic;
-//Requerimiento 1.- Actualizar el dominante para variables en la expresion
-//                  Ejemplo: float x; char y; y=x (Hecho)
-//Requerimiento 2.- Actualizar el dominante para el casteo y el valor de la subexpresion (Hecho)
-//Requerimiento 3.- Programar un metodo de conversion de un valor a un tipo de dato (Hecho)
-//                  private float convert(float valor, string tipoDato)
-//                  deberan usar el residuo de la division por %255, por %65535
-//Requerimiento 4.- Evaluar nuevamente la condicion del if, while, o do while con respecto
-//                  al parametro que recibe (Hecho)
-//Requerimiento 5.- Levantar una excepcion en el scanf cuando la captura no sea un numero
-//Requerimiento 6.- Ejecutar el for() 
+//Requerimiento 1: Actualizacion:
+//                 a)agregar el residuo de la division en porfactor
+//                 b)agregar en instruccion los incrementos de termino y los incrementos de factor
+//                   a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1
+//                   en donde el uno puede ser una expresion
+//                 c)Marcar errores semanticos cuando los incrementos de termino o incrementos de factor
+//                   superen el rango de la variable
+//                 d)Considerar el inciso b y c para el for
+//                 e)Que funcione el do y el while
+
 namespace Semantica
 {
     public class Lenguaje : Sintaxis
@@ -68,13 +68,13 @@ namespace Semantica
         
         private float convert(float valor, Variable.TipoDato tipo)
         {
-            if(dominante == Variable.TipoDato.Char && valor > 255)
+            if(dominante == Variable.TipoDato.Char)
             {
-                valor = valor%256;
+                valor = (char)(valor)%256;
                 return valor;
-            } else if(dominante == Variable.TipoDato.Int && valor > 65535)
+            } else if(dominante == Variable.TipoDato.Int)
             {
-                valor = valor%65536;
+                valor = (int)(valor)%65536;
                 return valor;
             }
             else
@@ -92,7 +92,6 @@ namespace Semantica
                     return v.getValor();
                 }
             }
-
             return 0;
         }
 
@@ -286,32 +285,39 @@ namespace Semantica
                 {
                     throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
                 }
-            }
-            log.WriteLine();
-            log.Write(getContenido() + " = ");
-            string nombre = getContenido();
-            match(Tipos.Identificador); 
-            match(Tipos.Asignacion);
-            dominante = Variable.TipoDato.Char;
-            Expresion();
-            match(";");
-            float resultado = stack.Pop();
-            log.Write("= "+resultado);
-            log.WriteLine();
-            if(dominante < evaluaNumero(resultado))
-            {
-                dominante = evaluaNumero(resultado);
-            }
-            if(dominante <= getTipo(nombre))
-            {
-                if(evaluacion)
+                log.WriteLine();
+                log.Write(getContenido() + " = ");
+                string nombre = getContenido();
+                match(Tipos.Identificador); 
+                dominante = Variable.TipoDato.Char;
+                if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
                 {
-                    modVariable(nombre, resultado);
+                    //Requerimiento 1.b
                 }
-            }
-            else
-            {
-                throw new Error("Error de semantica, no podemos asignar un <" + dominante + "> a un <" + getTipo(nombre) + "> en la linea " + linea, log);
+                else
+                {
+                    match(Tipos.Asignacion);
+                    Expresion();
+                    match(";");
+                    float resultado = stack.Pop();
+                    log.Write("= "+resultado);
+                    log.WriteLine();
+                    if(dominante < evaluaNumero(resultado))
+                    {
+                        dominante = evaluaNumero(resultado);
+                    }
+                    if(dominante <= getTipo(nombre))
+                    {
+                        if(evaluacion)
+                        {
+                            modVariable(nombre, resultado);
+                        }
+                    }
+                    else
+                    {
+                        throw new Error("Error de semantica, no podemos asignar un <" + dominante + "> a un <" + getTipo(nombre) + "> en la linea " + linea, log);
+                    }
+                }
             }
         }
 
@@ -374,14 +380,10 @@ namespace Semantica
             match("for");
             match("(");
             Asignacion(evaluacion);
-            //Requerimiento 4:
-            //Requerimiento 6:
-            //                  a)Necesito guardar la posicion del archivo de texto
             string variable = getContenido();
             bool validarFor;
             int pos = posicion;
             int lin = linea;
-            //                  b)Agregar un ciclo while
             do
             {
                 validarFor = Condicion();
@@ -391,6 +393,7 @@ namespace Semantica
                 }
                 match(";");
                 Incremento(validarFor);
+                //Requerimiento 1.d
                 match(")");
                 if(getContenido() == "{")
                 {
@@ -407,8 +410,6 @@ namespace Semantica
                     setPosicion(posicion);
                     NextToken();
                 }
-                //              c)Regresar a la posicion de lectura del archivo
-                //              d)Sacar otro token
             }while(validarFor);
         }
 
@@ -668,6 +669,7 @@ namespace Semantica
                 log.Write(operador+" ");
                 float n1=stack.Pop();
                 float n2=stack.Pop();
+                //Requerimiento 1.a
                 switch(operador)
                 {
                     case "*":
@@ -736,10 +738,6 @@ namespace Semantica
                 {
                     dominante = casteo;
                     float valor = stack.Pop();
-                    if(valor%1 !=0 && dominante != Variable.TipoDato.Float)
-                    {
-                        valor = MathF.Truncate(valor);
-                    }
                     valor = convert(valor, dominante);
                     stack.Push(valor);
                 }

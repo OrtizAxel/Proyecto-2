@@ -1,23 +1,19 @@
 Archivo: prueba.cpp
-06/10/2022 05:15:29 p. m.
-altura 2 
-i = altura = 5
-i 0 
-j = 0 = 0
-j altura i - j 2 j altura i - j 2 i 0 
-j = 0 = 0
-j altura i - j 2 j altura i - j 2 j altura i - j 2 i 0 
-j = 0 = 0
-j altura i - j 2 j altura i - j 2 j altura i - j 2 j altura i - j 2 i 0 
-j = 0 = 0
-j altura i - j 2 j altura i - j 2 j altura i - j 2 j altura i - j 2 j altura i - j 2 i 0 
-j = 0 = 0
-j altura i - j 2 j altura i - j 2 j altura i - j 2 j altura i - j 2 j altura i - j 2 j altura i - j 2 i 0 
-j = 0 = 0
-j altura i - j 2 1 1 2 2 
-a = 256 = 256
-a 
-y = a = 0
-y 
-y = a = 256
-Error de semantica, no podemos asignar un <Int> a un <Char> en la linea 45
+07/10/2022 09:48:42 a. m.
+
+x = 34.67 = 34.67
+
+y = x = 34
+
+Variables: 
+area Float 0
+radio Float 0
+pi Float 0
+resultado Float 0
+a Int 0
+d Int 0
+altura Int 0
+x Float 34.67
+y Char 34
+i Int 0
+j Int 0
