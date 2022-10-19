@@ -1,9 +1,5 @@
 Archivo: prueba.cpp
-07/10/2022 09:48:42 a. m.
-
-x = 34.67 = 34.67
-
-y = x = 34
+19/10/2022 09:46:02 a. m.
 
 Variables: 
 area Float 0
@@ -13,7 +9,7 @@ resultado Float 0
 a Int 0
 d Int 0
 altura Int 0
-x Float 34.67
-y Char 34
+x Float 0
+y Char 0
 i Int 0
 j Int 0

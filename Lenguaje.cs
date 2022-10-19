@@ -6,10 +6,14 @@ using System.Collections.Generic;
 //                 b)agregar en instruccion los incrementos de termino y los incrementos de factor
 //                   a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1
 //                   en donde el uno puede ser una expresion
+//                 c)programar el destructor para ejecutar el metodo cerrarArchivo()
+//                  #libreria especial
+//Requerimiento 2:    
 //                 c)Marcar errores semanticos cuando los incrementos de termino o incrementos de factor
 //                   superen el rango de la variable
 //                 d)Considerar el inciso b y c para el for
 //                 e)Que funcione el do y el while
+//                  
 
 namespace Semantica
 {
@@ -26,6 +30,12 @@ namespace Semantica
         public Lenguaje(string nombre) : base(nombre)
         {
 
+        }
+
+        ~Lenguaje()
+        {
+            Console.WriteLine("Destructor");
+            cerrar();
         }
 
         private void addVariable(String nombre,Variable.TipoDato tipo)
@@ -279,44 +289,41 @@ namespace Semantica
         //Asignacion -> identificador = cadena | Expresion;
         private void Asignacion(bool evaluacion)
         {
-            if(getClasificacion() == Tipos.Identificador)
+            if(!existeVariable(getContenido()))
             {
-                if(!existeVariable(getContenido()))
-                {
-                    throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
-                }
+                throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
+            }
+            log.WriteLine();
+            log.Write(getContenido() + " = ");
+            string nombre = getContenido();
+            match(Tipos.Identificador); 
+            dominante = Variable.TipoDato.Char;
+            if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
+            {
+                //Requerimiento 1.b
+            }
+            else
+            {
+                match(Tipos.Asignacion);
+                Expresion();
+                match(";");
+                float resultado = stack.Pop();
+                log.Write("= "+resultado);
                 log.WriteLine();
-                log.Write(getContenido() + " = ");
-                string nombre = getContenido();
-                match(Tipos.Identificador); 
-                dominante = Variable.TipoDato.Char;
-                if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
+                if(dominante < evaluaNumero(resultado))
                 {
-                    //Requerimiento 1.b
+                    dominante = evaluaNumero(resultado);
+                }
+                if(dominante <= getTipo(nombre))
+                {
+                    if(evaluacion)
+                    {
+                        modVariable(nombre, resultado);
+                    }
                 }
                 else
                 {
-                    match(Tipos.Asignacion);
-                    Expresion();
-                    match(";");
-                    float resultado = stack.Pop();
-                    log.Write("= "+resultado);
-                    log.WriteLine();
-                    if(dominante < evaluaNumero(resultado))
-                    {
-                        dominante = evaluaNumero(resultado);
-                    }
-                    if(dominante <= getTipo(nombre))
-                    {
-                        if(evaluacion)
-                        {
-                            modVariable(nombre, resultado);
-                        }
-                    }
-                    else
-                    {
-                        throw new Error("Error de semantica, no podemos asignar un <" + dominante + "> a un <" + getTipo(nombre) + "> en la linea " + linea, log);
-                    }
+                    throw new Error("Error de semantica, no podemos asignar un <" + dominante + "> a un <" + getTipo(nombre) + "> en la linea " + linea, log);
                 }
             }
         }
