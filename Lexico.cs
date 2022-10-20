@@ -66,11 +66,15 @@ namespace Semantica
             bool existencia = File.Exists(path);
             log = new StreamWriter("C:\\Users\\Axrro\\OneDrive\\Documentos\\Escuela\\Tareas\\Lenguajes y Automatas II\\Repositorio\\Proyecto-2\\prueba.Log"); 
             log.AutoFlush = true;
-            asm = new StreamWriter("Prueba.asm");
+            asm = new StreamWriter("C:\\Users\\Axrro\\OneDrive\\Documentos\\Escuela\\Tareas\\Lenguajes y Automatas II\\Repositorio\\Proyecto-2\\Prueba.asm");
             asm.AutoFlush = true;
             //log.WriteLine("Primer constructor");
             log.WriteLine("Archivo: prueba.cpp");
-            log.WriteLine(DateTime.Now);//Requerimiento 1:
+            log.WriteLine("Fecha "+DateTime.Now);//Requerimiento 1:
+
+            asm.WriteLine("Archivo: prueba.cpp");
+            asm.WriteLine("Fecha: " +DateTime.Now);
+            
             //Investigar como checar si un archivo existe o no existe 
             if (existencia == true)
             {

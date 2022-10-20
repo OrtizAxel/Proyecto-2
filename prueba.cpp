@@ -8,6 +8,9 @@ float x;
 char y;int i ;int j;
 // Este programa calcula el volumen de un cilindro.
 void main(){
+    
+    y = (3+5)*8-(10-4)/2;
+    /*
     y = 255;
     y++;
     y+=2;
@@ -46,5 +49,5 @@ void main(){
     printf("\nValor de variable char y despues del casteo de a: ");
     printf(y);
     printf("\nA continuacion se intenta asignar un int a un char sin usar casteo: \n");
-    y = a; //Requerimiento 1.- debe marcar error
+    y = a; //Requerimiento 1.- debe marcar error*/
 }

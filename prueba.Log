@@ -1,5 +1,7 @@
 Archivo: prueba.cpp
-19/10/2022 09:46:02 a. m.
+Fecha 20/10/2022 09:58:34 a. m.
+
+y = 3 5 + 8 * 10 4 - 2 / - = 61
 
 Variables: 
 area Float 0
@@ -10,6 +12,6 @@ a Int 0
 d Int 0
 altura Int 0
 x Float 0
-y Char 0
+y Char 61
 i Int 0
 j Int 0
