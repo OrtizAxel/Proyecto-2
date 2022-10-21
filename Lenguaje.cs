@@ -9,12 +9,13 @@ using System.Collections.Generic;
 //                 c)programar el destructor para ejecutar el metodo cerrarArchivo()
 //                  #libreria especial
 //Requerimiento 2:    
-//                 c)Marcar errores semanticos cuando los incrementos de termino o incrementos de factor
+//                 a)Marcar errores semanticos cuando los incrementos de termino o incrementos de factor
 //                   superen el rango de la variable
-//                 d)Considerar el inciso b y c para el for
-//                 e)Que funcione el do y el while
+//                 b)Considerar el inciso b y c para el for
+//                 c)Que funcione el do y el while
 //Requerimiento 3:
-//                 a)Considerar las variables y los casteos de las expresiones matematicas en ensamblador    
+//                 a)Considerar las variables y los casteos de las expresiones matematicas en ensamblador 
+//                 b)Considerar el residuo de la division en ensamblador   
 
 namespace Semantica
 {
@@ -46,11 +47,19 @@ namespace Semantica
 
         private void displayVariables()
         {
-            log.WriteLine();
             log.WriteLine("Variables: ");
             foreach(Variable v in variables)
             {
                 log.WriteLine(v.getNombre()+" "+v.getTipo()+" "+v.getValor());
+            }
+        }
+
+        private void variablesAsm()
+        {
+            asm.WriteLine("Variables: ");
+            foreach(Variable v in variables)
+            {
+                asm.WriteLine("\t" + v.getNombre()+" DW ?");
             }
         }
 
@@ -126,6 +135,7 @@ namespace Semantica
             asm.WriteLine("ORG 100h");
             Libreria();
             Variables();
+            variablesAsm();
             Main();
             displayVariables();
             asm.WriteLine("RET");
@@ -316,7 +326,7 @@ namespace Semantica
                 match(";");
                 float resultado = stack.Pop();
                 asm.WriteLine("Pop AX");
-                log.Write("= "+resultado);
+                log.Write("= " + resultado);
                 log.WriteLine();
                 if(dominante < evaluaNumero(resultado))
                 {
@@ -327,6 +337,7 @@ namespace Semantica
                     if(evaluacion)
                     {
                         modVariable(nombre, resultado);
+                        asm.WriteLine("Mov " + nombre + ", AX");
                     }
                 }
                 else
@@ -660,9 +671,9 @@ namespace Semantica
                 Termino();
                 log.Write(operador+" ");
                 float n1=stack.Pop();
-                asm.WriteLine("Pop AX");
-                float n2=stack.Pop();
                 asm.WriteLine("Pop BX");
+                float n2=stack.Pop();
+                asm.WriteLine("Pop AX");
                 switch(operador)
                 {
                     case "+":
@@ -694,20 +705,20 @@ namespace Semantica
                 Factor();
                 log.Write(operador+" ");
                 float n1=stack.Pop();
-                asm.WriteLine("Pop AX");
-                float n2=stack.Pop();
                 asm.WriteLine("Pop BX");
-                //Requerimiento 1.a
+                float n2=stack.Pop();
+                asm.WriteLine("Pop AX");
+                //Requerimiento 1.a y 3.b
                 switch(operador)
                 {
                     case "*":
                         stack.Push(n2*n1);
-                        asm.WriteLine("MUL AX, BX");
+                        asm.WriteLine("MUL BX");
                         asm.WriteLine("Push AX");
                         break;
                     case "/":
                         stack.Push(n2/n1);
-                        asm.WriteLine("DIV AX, BX");
+                        asm.WriteLine("DIV BX");
                         asm.WriteLine("Push AX");
                         break;
                 }
