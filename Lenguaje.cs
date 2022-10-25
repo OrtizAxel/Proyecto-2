@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 //Requerimiento 1: Actualizacion:
-//                 a)agregar el residuo de la division en porfactor
+//                 a)agregar el residuo de la division en porfactor (Hecho)
 //                 b)agregar en instruccion los incrementos de termino y los incrementos de factor
 //                   a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1
 //                   en donde el uno puede ser una expresion
@@ -11,11 +11,11 @@ using System.Collections.Generic;
 //Requerimiento 2:    
 //                 a)Marcar errores semanticos cuando los incrementos de termino o incrementos de factor
 //                   superen el rango de la variable
-//                 b)Considerar el inciso b y c para el for
+//                 b)Considerar el inciso b y c del requerimiento 1 para el for
 //                 c)Que funcione el do y el while
 //Requerimiento 3:
 //                 a)Considerar las variables y los casteos de las expresiones matematicas en ensamblador 
-//                 b)Considerar el residuo de la division en ensamblador   
+//                 b)Considerar el residuo de la division en ensamblador   (Hecho)
 
 namespace Semantica
 {
@@ -24,14 +24,15 @@ namespace Semantica
         List <Variable> variables = new List<Variable>();
         Stack<float> stack = new Stack<float>();
         Variable.TipoDato dominante;
+        int cIf;
 
         public Lenguaje()
         {
-
+            cIf = 0;
         }
         public Lenguaje(string nombre) : base(nombre)
         {
-
+            cIf = 0;
         }
 
         ~Lenguaje()
@@ -140,7 +141,6 @@ namespace Semantica
             displayVariables();
             asm.WriteLine("RET");
             asm.WriteLine("END");
-            asm.WriteLine("Pop AX");
         }
 
         //Librerias -> #include<identificador(.h)?> Librerias?
@@ -318,6 +318,34 @@ namespace Semantica
             if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
             {
                 //Requerimiento 1.b
+                /*float resultado = getValor(nombre);
+                switch(getContenido())
+                {
+                    case "++":
+                        match(Tipos.IncrementoTermino);
+                        match(";");
+                        resultado++;
+                        asm.WriteLine("Pop AX");
+                        log.Write("= " + resultado);
+                        log.WriteLine();
+                        if(dominante < evaluaNumero(resultado))
+                        {
+                            dominante = evaluaNumero(resultado);
+                        }
+                        if(dominante <= getTipo(nombre))
+                        {
+                            if(evaluacion)
+                            {
+                                modVariable(nombre, resultado);
+                                asm.WriteLine("Mov " + nombre + ", AX");
+                            }
+                        }
+                        else
+                        {
+                            throw new Error("Error de semantica, no podemos asignar un <" + dominante + "> a un <" + getTipo(nombre) + "> en la linea " + linea, log);
+                        }
+                        break;
+                }*/
             }
             else
             {
@@ -418,7 +446,7 @@ namespace Semantica
                     validarFor = false;
                 }
                 match(";");
-                Incremento(validarFor);
+                IncrementoFor(validarFor);
                 //Requerimiento 1.d
                 match(")");
                 if(getContenido() == "{")
@@ -440,9 +468,11 @@ namespace Semantica
         }
 
         //Incremento -> Identificador ++ | --
-        private void Incremento(bool evaluacion)
+        private void IncrementoFor(bool evaluacion)
         {
             string variable = getContenido();
+            Console.WriteLine(variable);
+            
             if(!existeVariable(getContenido()))
                 throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
             match(Tipos.Identificador);
@@ -542,9 +572,9 @@ namespace Semantica
         //If -> if(Condicion) bloque de instrucciones (else bloque de instrucciones)?
         private void If(bool evaluacion)
         {
+            string etiquetaIf = "if" + ++cIf;
             match("if");
             match("(");
-            //Requerimiento 4
             bool validarIf = Condicion();
             if(!evaluacion)
             {
@@ -562,7 +592,6 @@ namespace Semantica
             if(getContenido() == "else")
             {
                 match("else");
-                //Requerimiento 4 Se debe comportar alravez
                 if(getContenido() == "{")
                 {
                     if(evaluacion)
@@ -586,6 +615,7 @@ namespace Semantica
                     }
                 }
             }
+            asm.WriteLine(etiquetaIf + ":");
         }
 
         //Printf -> printf(cadena o expresion);
@@ -720,6 +750,11 @@ namespace Semantica
                         stack.Push(n2/n1);
                         asm.WriteLine("DIV BX");
                         asm.WriteLine("Push AX");
+                        break;
+                    case "%":
+                        stack.Push(n2%n1);
+                        asm.WriteLine("DIV BX");
+                        asm.WriteLine("Push DX");
                         break;
                 }
             }
