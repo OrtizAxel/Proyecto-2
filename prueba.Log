@@ -1,18 +1,7 @@
 Archivo: prueba.cpp
-Fecha 25/10/2022 09:48:11 a. m.
+Fecha 28/10/2022 03:03:18 p. m.
 
-y = 61 = 61
-60 61 
-x = 10 = 10
-Variables: 
-area Float 0
-radio Float 0
-pi Float 0
-resultado Float 0
-a Int 0
-d Int 0
-altura Int 0
-x Float 0
-y Char 61
-i Int 0
-j Int 0
+y = 255 = 255
+
+y = = 256
+Error de semantica, no podemos asignar un <Int> a un <Char> en la linea 14

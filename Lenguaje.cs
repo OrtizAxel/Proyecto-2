@@ -10,12 +10,20 @@ using System.Collections.Generic;
 //                  #libreria especial
 //Requerimiento 2:    
 //                 a)Marcar errores semanticos cuando los incrementos de termino o incrementos de factor
-//                   superen el rango de la variable
+//                   superen el rango de la variable 
 //                 b)Considerar el inciso b y c del requerimiento 1 para el for
-//                 c)Que funcione el do y el while
+//                 c)Que funcione el do while y el while
 //Requerimiento 3:
 //                 a)Considerar las variables y los casteos de las expresiones matematicas en ensamblador 
 //                 b)Considerar el residuo de la division en ensamblador   (Hecho)
+//                 c)Programar el printf y el scanf en ensamblador (Hecho)
+//Requerimiento 4: 
+//                 a)Programar el else en ensamblador
+//                 b)Programar el for en ensamblador
+//Requerimiento 5:
+//                 a)Programar el while en ensamblador
+//                 b)Programar el do while en ensamblador
+
 
 namespace Semantica
 {
@@ -25,14 +33,15 @@ namespace Semantica
         Stack<float> stack = new Stack<float>();
         Variable.TipoDato dominante;
         int cIf;
+        int cFor;
 
         public Lenguaje()
         {
-            cIf = 0;
+            cIf = cFor = 0;
         }
         public Lenguaje(string nombre) : base(nombre)
         {
-            cIf = 0;
+            cIf = cFor = 0;
         }
 
         ~Lenguaje()
@@ -131,7 +140,7 @@ namespace Semantica
         //Programa  -> Librerias? Variables? Main
         public void Programa()
         {
-            asm.WriteLine("make COM");
+            asm.WriteLine("#make COM");
             asm.WriteLine("include 'emu 8086.inc'");
             asm.WriteLine("ORG 100h");
             Libreria();
@@ -140,7 +149,7 @@ namespace Semantica
             Main();
             displayVariables();
             asm.WriteLine("RET");
-            asm.WriteLine("END");
+            asm.WriteLine("DEFINE_SCAN_NUM");
         }
 
         //Librerias -> #include<identificador(.h)?> Librerias?
@@ -318,34 +327,43 @@ namespace Semantica
             if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
             {
                 //Requerimiento 1.b
-                /*float resultado = getValor(nombre);
+                float resultado = getValor(nombre);
                 switch(getContenido())
                 {
                     case "++":
                         match(Tipos.IncrementoTermino);
                         match(";");
                         resultado++;
-                        asm.WriteLine("Pop AX");
-                        log.Write("= " + resultado);
-                        log.WriteLine();
-                        if(dominante < evaluaNumero(resultado))
-                        {
-                            dominante = evaluaNumero(resultado);
-                        }
-                        if(dominante <= getTipo(nombre))
-                        {
-                            if(evaluacion)
-                            {
-                                modVariable(nombre, resultado);
-                                asm.WriteLine("Mov " + nombre + ", AX");
-                            }
-                        }
-                        else
-                        {
-                            throw new Error("Error de semantica, no podemos asignar un <" + dominante + "> a un <" + getTipo(nombre) + "> en la linea " + linea, log);
-                        }
                         break;
-                }*/
+                    case "--":
+                        match(Tipos.IncrementoTermino);
+                        match(";");
+                        resultado--;
+                        break;
+                    case "+=":
+                        match(Tipos.IncrementoFactor);
+                        ;
+                        break;
+                }
+                asm.WriteLine("Pop AX");
+                log.Write("= " + resultado);
+                log.WriteLine();
+                if(dominante < evaluaNumero(resultado))
+                {
+                    dominante = evaluaNumero(resultado);
+                }
+                if(dominante <= getTipo(nombre))
+                {
+                    if(evaluacion)
+                    {
+                        modVariable(nombre, resultado);
+                    }
+                }
+                else
+                {
+                    throw new Error("Error de semantica, no podemos asignar un <" + dominante + "> a un <" + getTipo(nombre) + "> en la linea " + linea, log);
+                }
+                asm.WriteLine("Mov " + nombre + ", AX");
             }
             else
             {
@@ -431,6 +449,9 @@ namespace Semantica
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
         {
+            string etiquetaInicioFor = "inicioFor" + cFor;
+            string etiquetaFinFor = "finFor" + cFor++;
+            asm.WriteLine(etiquetaInicioFor + ":");
             match("for");
             match("(");
             Asignacion(evaluacion);
@@ -465,14 +486,13 @@ namespace Semantica
                     NextToken();
                 }
             }while(validarFor);
+            asm.WriteLine(etiquetaFinFor + ":");
         }
 
         //Incremento -> Identificador ++ | --
         private void IncrementoFor(bool evaluacion)
         {
             string variable = getContenido();
-            Console.WriteLine(variable);
-            
             if(!existeVariable(getContenido()))
                 throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
             match(Tipos.Identificador);
@@ -647,6 +667,7 @@ namespace Semantica
                         Console.Write(cadena[i]);
                     }
                 }
+                asm.WriteLine("PRINTN " + getContenido());
                 match(Tipos.Cadena);
             }
             else
@@ -657,6 +678,7 @@ namespace Semantica
                 if(evaluacion)
                 {
                     Console.Write(resultado);
+                    //codigo ensamblador para imprimir una variable
                 }
             }
             match(")");
@@ -678,7 +700,6 @@ namespace Semantica
             if(evaluacion)
             {
                 string val = ""+Console.ReadLine(); 
-                //Requerimiento 5
                 double validaVal;
                 if(!double.TryParse(val, out validaVal))
                 {
@@ -686,7 +707,9 @@ namespace Semantica
                 }
                 float valorFloat = float.Parse(val);
                 modVariable(getContenido(), valorFloat);
-            }         
+            } 
+            asm.WriteLine("CALL SCAN_NUM");
+            asm.WriteLine("MOV " + getContenido() + ", CX");        
             match(Tipos.Identificador);
             match(")");
             match(";");

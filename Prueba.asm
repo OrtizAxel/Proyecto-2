@@ -1,6 +1,6 @@
 Archivo: prueba.cpp
-Fecha: 25/10/2022 09:48:11 a. m.
-make COM
+Fecha: 28/10/2022 03:03:18 p. m.
+#make COM
 include 'emu 8086.inc'
 ORG 100h
 Variables: 
@@ -15,22 +15,10 @@ Variables:
 	y DW ?
 	i DW ?
 	j DW ?
-Mov AX, 61
+	k DW ?
+	l DW ?
+Mov AX, 255
 Push AX
 Pop AX
 Mov y, AX
-Mov AX, 60
-Push AX
-Mov AX, 61
-Push AX
 Pop AX
-Pop BX
-Cmp AX, BX
-JNE, if1
-Mov AX, 10
-Push AX
-Pop AX
-Mov x, AX
-if1:
-RET
-END
