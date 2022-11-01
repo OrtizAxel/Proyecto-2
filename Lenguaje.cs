@@ -5,14 +5,14 @@ using System.Collections.Generic;
 //                 a)agregar el residuo de la division en porfactor (Hecho)
 //                 b)agregar en instruccion los incrementos de termino y los incrementos de factor
 //                   a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1
-//                   en donde el uno puede ser una expresion
+//                   en donde el uno puede ser una expresion (Hecho)
 //                 c)programar el destructor para ejecutar el metodo cerrarArchivo()
 //                  #libreria especial
 //Requerimiento 2:    
 //                 a)Marcar errores semanticos cuando los incrementos de termino o incrementos de factor
-//                   superen el rango de la variable 
+//                   superen el rango de la variable  (Hecho)
 //                 b)Considerar el inciso b y c del requerimiento 1 para el for
-//                 c)Que funcione el do while y el while
+//                 c)Que funcione el do while y el while (Hecho)
 //Requerimiento 3:
 //                 a)Considerar las variables y los casteos de las expresiones matematicas en ensamblador 
 //                 b)Considerar el residuo de la division en ensamblador   (Hecho)
@@ -327,25 +327,8 @@ namespace Semantica
             if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
             {
                 //Requerimiento 1.b
-                float resultado = getValor(nombre);
-                switch(getContenido())
-                {
-                    case "++":
-                        match(Tipos.IncrementoTermino);
-                        match(";");
-                        resultado++;
-                        break;
-                    case "--":
-                        match(Tipos.IncrementoTermino);
-                        match(";");
-                        resultado--;
-                        break;
-                    case "+=":
-                        match(Tipos.IncrementoFactor);
-                        ;
-                        break;
-                }
-                asm.WriteLine("Pop AX");
+                float resultado = Incremento(nombre);
+                match(";");
                 log.Write("= " + resultado);
                 log.WriteLine();
                 if(dominante < evaluaNumero(resultado))
@@ -398,46 +381,76 @@ namespace Semantica
         {
             match("while");
             match("(");
-            bool validarWhile = Condicion("");
-            //Requerimiento 4
-            if(!evaluacion)
+            string variable = getContenido();
+            if(!existeVariable(getContenido()))
+                throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
+            bool validarWhile;
+            int pos = posicion;
+            int lin = linea;
+            do
             {
-                validarWhile = false;
-            }
-            match(")");
-            if(getContenido() == "{") 
-            {
-                BloqueInstrucciones(validarWhile);
-            }
-            else
-            {
-                Instruccion(validarWhile);
-            }
+                validarWhile = Condicion("");            
+                if(!evaluacion)
+                {
+                    validarWhile = false;
+                }
+                match(")");
+                if(getContenido() == "{") 
+                {
+                    BloqueInstrucciones(validarWhile);
+                }
+                else
+                {
+                    Instruccion(validarWhile);
+                }
+                if(validarWhile)
+                {
+                    posicion = pos - variable.Length;
+                    linea = lin;
+                    setPosicion(posicion);
+                    NextToken();
+                }
+            }while(validarWhile);
         }
 
         //Do -> do bloque de instrucciones | intruccion while(Condicion)
         private void Do(bool evaluacion)
         {
-            bool validarDo = evaluacion;
             match("do");
-            if(getContenido() == "{")
+            bool validarDo = evaluacion;
+            int pos = posicion;
+            int lin = linea;
+            do
             {
-                BloqueInstrucciones(validarDo);
-            }
-            else
-            {
-                Instruccion(validarDo);
-            } 
-            match("while");
-            match("(");
-            //Requerimiento 4
-            validarDo = Condicion("");
-            if(!evaluacion)
-            {
-                validarDo = false;
-            }
-            match(")");
-            match(";");
+                if(getContenido() == "{")
+                {
+                    BloqueInstrucciones(validarDo);
+                }
+                else
+                {
+                    Instruccion(validarDo);
+                } 
+                match("while");
+                match("(");
+                string variable = getContenido();
+                if(!existeVariable(getContenido()))
+                    throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
+                validarDo = Condicion("");
+                if(!evaluacion)
+                {
+                    validarDo = false;
+                }
+                match(")");
+                match(";");
+                if(validarDo)
+                {
+                    posicion = pos - variable.Length;
+                    linea = lin;
+                    setPosicion(posicion);
+                    NextToken();
+                }
+            }while(validarDo);
+            
         }
 
         public void setPosicion(long posicion)
@@ -456,6 +469,8 @@ namespace Semantica
             match("(");
             Asignacion(evaluacion);
             string variable = getContenido();
+            if(!existeVariable(getContenido()))
+                throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
             bool validarFor;
             int pos = posicion;
             int lin = linea;
@@ -467,8 +482,8 @@ namespace Semantica
                     validarFor = false;
                 }
                 match(";");
-                IncrementoFor(validarFor);
-                //Requerimiento 1.d
+                match(Tipos.Identificador);
+                float resultado = Incremento(variable);
                 match(")");
                 if(getContenido() == "{")
                 {
@@ -485,33 +500,57 @@ namespace Semantica
                     setPosicion(posicion);
                     NextToken();
                 }
+                if(evaluacion)
+                {
+                    modVariable(variable, resultado);
+                }
             }while(validarFor);
             asm.WriteLine(etiquetaFinFor + ":");
         }
 
-        //Incremento -> Identificador ++ | --
-        private void IncrementoFor(bool evaluacion)
+        private float Incremento(string nombre)
         {
-            string variable = getContenido();
-            if(!existeVariable(getContenido()))
-                throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
-            match(Tipos.Identificador);
-            if(getContenido() == "++")
+            float resultado = getValor(nombre);
+            switch(getContenido())
             {
-                match("++");
-                if(evaluacion)
-                {
-                    modVariable(variable, getValor(variable)+1);
-                }
+                case "++":
+                    match(Tipos.IncrementoTermino);
+                    resultado++;
+                    asm.WriteLine("Inc " + nombre);
+                    break;
+                case "--":
+                    match(Tipos.IncrementoTermino);
+                    asm.WriteLine("Dec " + nombre);
+                    resultado--;
+                    break;
+                case "+=":
+                    match(Tipos.IncrementoTermino);
+                    Expresion();
+                    resultado += stack.Pop();
+                    asm.WriteLine("Pop AX");
+                    break;
+                case "-=":
+                    match(Tipos.IncrementoTermino);
+                    Expresion();
+                    resultado -= stack.Pop();
+                    break;
+                case "*=":
+                    match(Tipos.IncrementoFactor);
+                    Expresion();
+                    resultado *= stack.Pop();
+                    break;
+                case "/=":
+                    match(Tipos.IncrementoFactor);
+                    Expresion();
+                    resultado /= stack.Pop();
+                    break;
+                case "%=":
+                    match(Tipos.IncrementoFactor);
+                    Expresion();
+                    resultado %= stack.Pop();
+                    break;
             }
-            else
-            {
-                match("--");
-                if(evaluacion)
-                {
-                    modVariable(variable, getValor(variable)-1);
-                }
-            }
+            return resultado;
         }
 
         //Switch -> switch (Expresion) {Lista de casos} | (default: )
