@@ -1,7 +1,5 @@
 Archivo: prueba.cpp
-Fecha 28/10/2022 03:03:18 p. m.
+Fecha 04/11/2022 09:40:04 a. m.
 
-y = 255 = 255
-
-y = = 256
-Error de semantica, no podemos asignar un <Int> a un <Char> en la linea 14
+i = 0 = 0
+i 3 i 3 i 3 i 3 Error de sintaxis, variable inexistente <{> en linea: 13

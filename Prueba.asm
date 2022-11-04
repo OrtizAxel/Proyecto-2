@@ -1,7 +1,7 @@
 Archivo: prueba.cpp
-Fecha: 28/10/2022 03:03:18 p. m.
+Fecha: 04/11/2022 09:40:04 a. m.
 #make COM
-include 'emu 8086.inc'
+include 'emu8086.inc'
 ORG 100h
 Variables: 
 	area DW ?
@@ -17,8 +17,46 @@ Variables:
 	j DW ?
 	k DW ?
 	l DW ?
-Mov AX, 255
+inicioFor0:
+Mov AX, 0
 Push AX
 Pop AX
-Mov y, AX
+Mov i, AX
+Mov AX, i
+Push AX
+Mov AX, 3
+Push AX
 Pop AX
+Pop BX
+Cmp AX, BX
+JGE 
+Inc i
+PRINTN "Hola"
+Mov AX, i
+Push AX
+Mov AX, 3
+Push AX
+Pop AX
+Pop BX
+Cmp AX, BX
+JGE 
+Inc i
+Mov AX, i
+Push AX
+Mov AX, 3
+Push AX
+Pop AX
+Pop BX
+Cmp AX, BX
+JGE 
+Inc i
+Mov AX, i
+Push AX
+Mov AX, 3
+Push AX
+Pop AX
+Pop BX
+Cmp AX, BX
+JGE 
+Inc i
+finFor0:
