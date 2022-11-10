@@ -1,8 +1,11 @@
 Archivo: prueba.cpp
-Fecha: 04/11/2022 09:40:04 a. m.
+Fecha: 08/11/2022 12:46:02 p. m.
 #make COM
 include 'emu8086.inc'
 ORG 100h
+DEFINE_SCAN_NUM
+DEFINE_PRINT_NUM_UNS
+DEFINE_PRINT_NUM
 Variables: 
 	area DW ?
 	radio DW ?
@@ -11,52 +14,23 @@ Variables:
 	a DW ?
 	d DW ?
 	altura DW ?
+	cinco DW ?
 	x DW ?
 	y DW ?
 	i DW ?
 	j DW ?
 	k DW ?
-	l DW ?
-inicioFor0:
-Mov AX, 0
-Push AX
-Pop AX
-Mov i, AX
-Mov AX, i
+Mov AX, 3
 Push AX
 Mov AX, 3
 Push AX
-Pop AX
 Pop BX
-Cmp AX, BX
-JGE 
-Inc i
-PRINTN "Hola"
-Mov AX, i
-Push AX
-Mov AX, 3
-Push AX
 Pop AX
-Pop BX
 Cmp AX, BX
-JGE 
-Inc i
-Mov AX, i
-Push AX
-Mov AX, 3
-Push AX
-Pop AX
-Pop BX
-Cmp AX, BX
-JGE 
-Inc i
-Mov AX, i
-Push AX
-Mov AX, 3
-Push AX
-Pop AX
-Pop BX
-Cmp AX, BX
-JGE 
-Inc i
-finFor0:
+JNE if1
+PRINT 'Hola'
+JMP else1
+if1:
+PRINT 'Adios'
+else1:
+RET

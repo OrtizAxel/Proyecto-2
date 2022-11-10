@@ -11,10 +11,10 @@ namespace Semantica
         {
             try
             {
-                Lenguaje a = new Lenguaje();
-
-                a.Programa();
-                a.cerrar();
+                using(Lenguaje a = new Lenguaje())
+                {
+                    a.Programa();
+                }
             }
             catch (Exception e)
             {

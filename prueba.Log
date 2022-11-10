@@ -1,5 +1,16 @@
 Archivo: prueba.cpp
-Fecha 04/11/2022 09:40:04 a. m.
-
-i = 0 = 0
-i 3 i 3 i 3 i 3 Error de sintaxis, variable inexistente <{> en linea: 13
+Fecha 08/11/2022 12:46:02 p. m.
+3 3 Variables: 
+area Float 0
+radio Float 0
+pi Float 0
+resultado Float 0
+a Int 0
+d Int 0
+altura Int 0
+cinco Int 0
+x Float 0
+y Char 0
+i Int 0
+j Int 0
+k Int 0
